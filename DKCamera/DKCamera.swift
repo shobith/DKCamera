@@ -17,6 +17,28 @@ public class DKCameraPassthroughView: UIView {
 	}
 }
 
+/*
+extension UIImage {
+    func crop(frame: CGRect, scale: CGFloat) -> UIImage {
+        let screenScale = UIScreen.mainScreen().scale
+        var mutableRect = frame
+        mutableRect.origin.x *= screenScale
+        mutableRect.origin.y *= screenScale
+        mutableRect.size.width *= screenScale
+        mutableRect.size.height *= screenScale
+        let drawPoint = CGPointZero
+        UIGraphicsBeginImageContextWithOptions(mutableRect.size, false, 0)
+        let context = UIGraphicsGetCurrentContext()
+        CGContextTranslateCTM(context, -mutableRect.origin.x, -mutableRect.origin.y)
+        CGContextScaleCTM(context, scale * screenScale, scale * screenScale)
+        drawAtPoint(drawPoint)
+        let croppedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext();
+        return croppedImage
+    }
+}
+*/
+
 public class DKCamera: UIViewController {
 	
 	public class func checkCameraPermission(handler: (granted: Bool) -> Void) {
@@ -130,7 +152,7 @@ public class DKCamera: UIViewController {
 		
 		if self.originalOrientation == nil {
 			self.contentView.frame = self.view.bounds
-			self.previewLayer.frame = self.view.bounds
+			self.previewLayer.frame = CGRect(x: 0, y: 75, width: self.view.frame.width, height: self.view.frame.width)//self.view.bounds
 		}
 	}
 	
@@ -171,7 +193,7 @@ public class DKCamera: UIViewController {
 	public func setupUI() {
 		self.view.backgroundColor = UIColor.blackColor()
 		self.view.addSubview(self.contentView)
-		self.contentView.backgroundColor = UIColor.clearColor()
+		self.contentView.backgroundColor = UIColor(white: 0, alpha: 0.4)//UIColor.clearColor()
 		self.contentView.frame = self.view.bounds
 		
 		let bottomViewHeight: CGFloat = 70
@@ -263,6 +285,41 @@ public class DKCamera: UIViewController {
 		self.didCancel?()
 	}
 	
+    private func cropToBounds(image: UIImage, width: Double, height: Double) -> UIImage {
+        
+        let contextImage: UIImage = UIImage(CGImage: image.CGImage!)
+        
+        let contextSize: CGSize = contextImage.size
+        
+        var posX: CGFloat = 0.0
+        var posY: CGFloat = 0.0
+        var cgwidth: CGFloat = CGFloat(width)
+        var cgheight: CGFloat = CGFloat(height)
+        
+        // See what size is longer and create the center off of that
+        if contextSize.width > contextSize.height {
+            posX = ((contextSize.width - contextSize.height) / 2)
+            posY = 0
+            cgwidth = contextSize.height
+            cgheight = contextSize.height
+        } else {
+            posX = 0
+            posY = ((contextSize.height - contextSize.width) / 2)
+            cgwidth = contextSize.width
+            cgheight = contextSize.width
+        }
+        
+        let rect: CGRect = CGRectMake(posX, posY, cgwidth, cgheight)
+        
+        // Create bitmap image from context using the rect
+        let imageRef: CGImageRef = CGImageCreateWithImageInRect(contextImage.CGImage, rect)!
+        
+        // Create a new image based on the imageRef and rotate back to the original orientation
+        let image: UIImage = UIImage(CGImage: imageRef, scale: image.scale, orientation: image.imageOrientation)
+        
+        return image
+    }
+    
 	public func takePicture() {
 		let authStatus = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
 		if authStatus == .Denied {
@@ -285,7 +342,7 @@ public class DKCamera: UIViewController {
 						let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
 
 						if let didFinishCapturingImage = self.didFinishCapturingImage, image = UIImage(data: imageData) {
-							didFinishCapturingImage(image: image)
+							didFinishCapturingImage(image: self.cropToBounds(image, width: Double(self.view.bounds.width), height: Double(self.view.bounds.width)))
 						}
 					} else {
 						print("error while capturing still image: \(error!.localizedDescription)", terminator: "")
@@ -380,11 +437,13 @@ public class DKCamera: UIViewController {
 		}
 		
 		self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-		self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspect
-		self.previewLayer.frame = self.view.bounds
-		
+		self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        //self.previewLayer.bounds = CGRect(x: 0, y: 75, width: self.view.frame.width, height: self.view.frame.width)
+        //self.previewLayer.frame = self.view.bounds
+        
 		let rootLayer = self.view.layer
 		rootLayer.masksToBounds = true
+        rootLayer.backgroundColor = UIColor.blackColor().CGColor
 		rootLayer.insertSublayer(self.previewLayer, atIndex: 0)
 	}
 	
