@@ -17,28 +17,6 @@ public class DKCameraPassthroughView: UIView {
 	}
 }
 
-/*
-extension UIImage {
-    func crop(frame: CGRect, scale: CGFloat) -> UIImage {
-        let screenScale = UIScreen.mainScreen().scale
-        var mutableRect = frame
-        mutableRect.origin.x *= screenScale
-        mutableRect.origin.y *= screenScale
-        mutableRect.size.width *= screenScale
-        mutableRect.size.height *= screenScale
-        let drawPoint = CGPointZero
-        UIGraphicsBeginImageContextWithOptions(mutableRect.size, false, 0)
-        let context = UIGraphicsGetCurrentContext()
-        CGContextTranslateCTM(context, -mutableRect.origin.x, -mutableRect.origin.y)
-        CGContextScaleCTM(context, scale * screenScale, scale * screenScale)
-        drawAtPoint(drawPoint)
-        let croppedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext();
-        return croppedImage
-    }
-}
-*/
-
 public class DKCamera: UIViewController {
 	
 	public class func checkCameraPermission(handler: (granted: Bool) -> Void) {
@@ -185,7 +163,7 @@ public class DKCamera: UIViewController {
 			}
 		}
 		
-		self.currentDevice = self.captureDeviceBack ?? self.captureDeviceFront
+		self.currentDevice = self.captureDeviceFront ?? self.captureDeviceBack
 	}
 	
     let bottomView = UIView()
@@ -378,7 +356,7 @@ public class DKCamera: UIViewController {
 	
 	// MARK: - Handles Switch Camera
 	
-	internal func switchCamera() {
+	public func switchCamera() {
 		self.currentDevice = self.currentDevice == self.captureDeviceBack ?
 			self.captureDeviceFront : self.captureDeviceBack
 		
