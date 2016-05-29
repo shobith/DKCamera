@@ -163,7 +163,7 @@ public class DKCamera: UIViewController {
 			}
 		}
 		
-		self.currentDevice = self.captureDeviceFront ?? self.captureDeviceBack
+		self.currentDevice = self.captureDeviceBack ?? self.captureDeviceFront
 	}
 	
     let bottomView = UIView()
