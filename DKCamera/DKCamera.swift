@@ -130,7 +130,7 @@ public class DKCamera: UIViewController {
 		
 		if self.originalOrientation == nil {
 			self.contentView.frame = self.view.bounds
-			self.previewLayer.frame = CGRect(x: 0, y: 75, width: self.view.frame.width, height: self.view.frame.width)//self.view.bounds
+			self.previewLayer.frame = CGRect(x: 0, y: 0.15 * self.view.frame.height, width: self.view.frame.width, height: self.view.frame.width)//self.view.bounds
 		}
 	}
 	
@@ -192,7 +192,7 @@ public class DKCamera: UIViewController {
 		}()
 		
 		cameraSwitchButton.frame.origin = CGPoint(x: bottomView.bounds.width - cameraSwitchButton.bounds.width - 15,
-			y: (bottomView.bounds.height - cameraSwitchButton.bounds.height) / 2)
+			y: ((bottomView.bounds.height - cameraSwitchButton.bounds.height) / 2) - 30)
 		cameraSwitchButton.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleBottomMargin]
 		bottomView.addSubview(cameraSwitchButton)
 		self.cameraSwitchButton = cameraSwitchButton
@@ -232,7 +232,7 @@ public class DKCamera: UIViewController {
 			return captureButton
 		}()
 		
-		captureButton.center = CGPoint(x: bottomView.bounds.width / 2, y: bottomView.bounds.height / 2)
+		captureButton.center = CGPoint(x: bottomView.bounds.width / 2, y: (bottomView.bounds.height / 2) - 30)
 		captureButton.autoresizingMask = [.FlexibleLeftMargin, .FlexibleRightMargin]
 		bottomView.addSubview(captureButton)
 		
@@ -246,11 +246,11 @@ public class DKCamera: UIViewController {
 			return cancelButton
 		}()
 		
-		cancelButton.frame.origin = CGPoint(x: contentView.bounds.width - cancelButton.bounds.width - 15, y: 25)
+		cancelButton.frame.origin = CGPoint(x: contentView.bounds.width - cancelButton.bounds.width - 5, y: 55)
 		cancelButton.autoresizingMask = [.FlexibleBottomMargin, .FlexibleLeftMargin]
 		contentView.addSubview(cancelButton)
 		
-		self.flashButton.frame.origin = CGPoint(x: 5, y: 15)
+		self.flashButton.frame.origin = CGPoint(x: 5, y: 55)
 		contentView.addSubview(self.flashButton)
 		
 		contentView.addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: Selector("handleZoom:")))
